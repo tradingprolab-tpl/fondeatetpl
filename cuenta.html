@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuenta · App Fondeo Trading Pro Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="tpl-app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-mark">R</div>
+        <div class="sidebar-brand-text">TRADING PRO <span>LAB</span></div>
+      </div>
+
+      <nav class="nav-group">
+        <a class="nav-link" href="dashboard.html"><span class="nav-icon">▦</span> Mis cuentas</a>
+        <a class="nav-link" href="simulador.html"><span class="nav-icon">∿</span> Simulador</a>
+        <a class="nav-link hidden" id="adminNavLink" href="admin.html"><span class="nav-icon">⚙</span> Panel admin</a>
+      </nav>
+
+      <div class="sidebar-footer nav-group">
+        <button class="nav-link" id="themeToggleBtn"><span class="nav-icon">◐</span> Cambiar tema</button>
+        <button class="nav-link" id="logoutBtn"><span class="nav-icon">⏻</span> Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <div class="tpl-main">
+      <header class="topbar">
+        <button class="btn-icon mobile-nav-toggle">☰</button>
+        <div class="tpl-eyebrow">
+          <a href="dashboard.html" style="color: inherit;">Mis cuentas</a> / <span id="breadcrumbName">—</span>
+        </div>
+        <div class="tpl-row tpl-gap-3">
+          <span class="avatar" id="userAvatar">—</span>
+        </div>
+      </header>
+
+      <div class="tpl-scroll-area">
+        <div class="tpl-container" id="accountContent">
+
+          <div class="state-block"><div class="spinner"></div><div class="state-title">Cargando cuenta...</div></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TEMPLATE: CONTENIDO REAL (clonado por JS una vez cargada la cuenta) ============ -->
+  <template id="accountTemplate">
+    <div class="account-header">
+      <div>
+        <div class="account-header-title">
+          <h1 id="accountName">—</h1>
+          <span class="badge" id="accountStatusBadge">—</span>
+        </div>
+        <div class="text-secondary" style="font-size: var(--fs-sm); margin-top: 4px;" id="accountMeta">—</div>
+        <div class="phase-pills" id="phasePills" style="margin-top: var(--sp-3);"></div>
+      </div>
+      <div class="tpl-row tpl-gap-2" id="phaseActions"></div>
+    </div>
+
+    <div id="criticalBannerWrap"></div>
+
+    <div class="kpi-strip" id="accountKpiStrip" style="grid-template-columns: repeat(4, 1fr);"></div>
+
+    <div class="account-tabs">
+      <button class="account-tab is-active" data-tab="resumen">Resumen</button>
+      <button class="account-tab" data-tab="journal">Journal</button>
+      <button class="account-tab" data-tab="charts">Gráficas</button>
+      <button class="account-tab" data-tab="calendar">Calendario</button>
+      <button class="account-tab" data-tab="risk">Motor de riesgo</button>
+      <button class="account-tab" data-tab="settings">Configuración</button>
+    </div>
+
+    <!-- ===== RESUMEN ===== -->
+    <div class="tab-panel is-active" data-tab="resumen">
+      <div class="two-col">
+        <div class="tpl-card">
+          <div class="tpl-panel-title">Progreso de la fase actual</div>
+          <div style="margin-top: var(--sp-4);">
+            <div class="tpl-row-between" style="display:flex; justify-content: space-between; font-size: var(--fs-sm); margin-bottom: 6px;">
+              <span class="text-secondary">Progreso hacia el target</span>
+              <span id="progressPctLabel" style="font-weight:700;">0%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
+          </div>
+
+          <div style="margin-top: var(--sp-6);" class="tpl-panel-title">Proyección</div>
+          <div id="projectionBox" class="text-secondary" style="margin-top: var(--sp-3); font-size: var(--fs-sm); line-height: 1.6;"></div>
+
+          <div style="margin-top: var(--sp-6);" class="tpl-panel-title">Estadísticas del historial</div>
+          <div id="statsGrid" class="kpi-strip" style="grid-template-columns: repeat(4,1fr); margin-top: var(--sp-3);"></div>
+        </div>
+
+        <div class="tpl-card">
+          <div class="tpl-panel-title">Estrategia bloqueada</div>
+          <div class="text-tertiary" style="font-size: var(--fs-2xs); margin-top: 4px;">El R:R y el riesgo base no deben cambiar a mitad de proceso.</div>
+          <div id="lockedStrategyBox" style="margin-top: var(--sp-4); display:flex; flex-direction:column; gap: var(--sp-3);"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== JOURNAL ===== -->
+    <div class="tab-panel" data-tab="journal">
+      <div class="journal-toolbar">
+        <div class="tpl-panel-title">Registro de operaciones</div>
+        <button class="btn btn-primary" id="openAddTradeBtn">+ Registrar operación</button>
+      </div>
+      <div class="tpl-table-wrap">
+        <table class="tpl-table">
+          <thead>
+            <tr><th>Fecha</th><th>Resultado</th><th>P&amp;L</th><th>Nota</th><th></th></tr>
+          </thead>
+          <tbody id="tradesTableBody"></tbody>
+        </table>
+      </div>
+      <div id="tradesEmptyState"></div>
+    </div>
+
+    <!-- ===== GRÁFICAS ===== -->
+    <div class="tab-panel" data-tab="charts">
+      <div style="display:flex; flex-direction:column; gap: var(--sp-5);">
+        <div class="tpl-card chart-card">
+          <div class="chart-card-head">
+            <div class="tpl-panel-title">Balance acumulado</div>
+          </div>
+          <div class="chart-canvas-wrap"><canvas id="balanceChart"></canvas></div>
+        </div>
+        <div class="tpl-card chart-card">
+          <div class="chart-card-head">
+            <div class="tpl-panel-title">P&amp;L por periodo</div>
+            <div class="segmented" id="pnlGranularitySwitch">
+              <button data-gran="day" class="is-active">Día</button>
+              <button data-gran="week">Semana</button>
+              <button data-gran="month">Mes</button>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap"><canvas id="pnlBarChart"></canvas></div>
+        </div>
+        <div class="tpl-card chart-card" style="max-width: 420px;">
+          <div class="chart-card-head"><div class="tpl-panel-title">Ganadas vs. perdidas</div></div>
+          <div class="chart-canvas-wrap is-short"><canvas id="winLossChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CALENDARIO ===== -->
+    <div class="tab-panel" data-tab="calendar">
+      <div class="tpl-card calendar-card">
+        <div class="calendar-nav">
+          <button class="btn-icon" id="calPrevBtn">‹</button>
+          <span class="calendar-month-label" id="calMonthLabel">—</span>
+          <button class="btn-icon" id="calNextBtn">›</button>
+        </div>
+        <div id="calendarContainer"></div>
+      </div>
+    </div>
+
+    <!-- ===== MOTOR DE RIESGO ===== -->
+    <div class="tab-panel" data-tab="risk">
+      <div class="tpl-card risk-engine-card">
+        <div>
+          <div class="tpl-panel-title">Modo de gestión de riesgo</div>
+          <div class="risk-mode-grid" id="riskModeGrid" style="margin-top: var(--sp-4);"></div>
+        </div>
+
+        <div class="tpl-row-between" style="display:flex; justify-content: space-between; align-items:center;">
+          <div class="tpl-row tpl-gap-3" style="display:flex; align-items:center; gap: var(--sp-3);">
+            <button class="switch" id="riskAutoModeSwitch"></button>
+            <span class="text-secondary" style="font-size: var(--fs-sm);">Modo automático (recalcula el riesgo sugerido en cada operación)</span>
+          </div>
+        </div>
+
+        <div class="risk-suggestion">
+          <div>
+            <div class="risk-suggestion-value" id="riskSuggestionValue">—%</div>
+            <div class="risk-suggestion-label">Riesgo sugerido para la próxima operación</div>
+          </div>
+          <div class="text-secondary" style="font-size: var(--fs-sm);" id="riskSuggestionReason">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CONFIGURACIÓN ===== -->
+    <div class="tab-panel" data-tab="settings">
+      <div class="two-col">
+        <div class="tpl-card">
+          <div class="tpl-panel-title">Datos generales</div>
+          <form id="settingsForm" style="margin-top: var(--sp-4); display:flex; flex-direction:column; gap: var(--sp-4);">
+            <div class="wizard-fields-grid">
+              <div class="field-group">
+                <label class="field-label">Nombre</label>
+                <input class="input" name="name" required />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Empresa</label>
+                <input class="input" name="company" required />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Riesgo base por operación (%)</label>
+                <input class="input" type="number" step="0.1" name="riskBasePct" required />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Ratio R:R fijo</label>
+                <select class="select" name="rr" id="rrSelect" required>
+                  <option value="1.5">1:1.5</option>
+                  <option value="2">1:2</option>
+                  <option value="3">1:3</option>
+                </select>
+                <div class="field-hint" id="rrLockHint" style="display:none;">El R:R no se puede modificar: ya hay operaciones registradas en esta fase.</div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Promedio de operaciones por día</label>
+                <input class="input" type="number" name="avgOpsPerDay" required />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Guardar cambios</button>
+          </form>
+        </div>
+
+        <div class="tpl-card">
+          <div class="tpl-panel-title">Fases de la cuenta</div>
+          <div id="phasesEditor" style="margin-top: var(--sp-4); display:flex; flex-direction:column; gap: var(--sp-5);"></div>
+        </div>
+      </div>
+
+      <div class="tpl-card" style="margin-top: var(--sp-5); border-color: rgba(224,57,74,0.35);">
+        <div class="tpl-panel-title" style="color: var(--color-danger);">Zona de riesgo</div>
+        <div class="tpl-row tpl-gap-3" style="margin-top: var(--sp-4); display:flex; gap: var(--sp-3);">
+          <button class="btn btn-secondary" id="archiveAccountBtn">Archivar cuenta</button>
+          <button class="btn btn-danger" id="deleteAccountBtn">Eliminar cuenta definitivamente</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ============ MODAL: REGISTRAR / EDITAR OPERACIÓN ============ -->
+  <div class="modal-backdrop hidden" id="tradeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="tpl-panel-title" id="tradeModalTitle">Registrar operación</h3>
+        <button class="btn-icon" id="closeTradeModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="tradeForm" style="display:flex; flex-direction:column; gap: var(--sp-4);">
+          <input type="hidden" name="tradeId" />
+          <div class="field-group">
+            <label class="field-label">Resultado</label>
+            <div class="segmented" id="tradeResultSwitch">
+              <button type="button" data-result="win" class="is-active">Ganada</button>
+              <button type="button" data-result="loss">Perdida</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Monto (USD, siempre positivo)</label>
+            <input class="input" type="number" step="0.01" min="0" name="amount" required />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Fecha y hora</label>
+            <input class="input" type="datetime-local" name="date" required />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Nota (opcional)</label>
+            <input class="input" name="note" placeholder="Ej. ruptura de rango en NY open" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelTradeBtn">Cancelar</button>
+        <button class="btn btn-primary" id="saveTradeBtn">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/cuenta.js"></script>
+</body>
+</html>
