@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · App Fondeo Trading Pro Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+
+  <div class="tpl-app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-mark">R</div>
+        <div class="sidebar-brand-text">TRADING PRO <span>LAB</span></div>
+      </div>
+
+      <nav class="nav-group">
+        <a class="nav-link is-active" href="dashboard.html"><span class="nav-icon">▦</span> Mis cuentas</a>
+        <a class="nav-link" href="simulador.html"><span class="nav-icon">∿</span> Simulador</a>
+        <a class="nav-link hidden" id="adminNavLink" href="admin.html"><span class="nav-icon">⚙</span> Panel admin</a>
+      </nav>
+
+      <div class="sidebar-footer nav-group">
+        <button class="nav-link" id="themeToggleBtn"><span class="nav-icon">◐</span> Cambiar tema</button>
+        <button class="nav-link" id="logoutBtn"><span class="nav-icon">⏻</span> Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <div class="tpl-main">
+      <header class="topbar">
+        <button class="btn-icon mobile-nav-toggle">☰</button>
+        <div class="tpl-eyebrow">El Camino del Rey</div>
+        <div class="tpl-row tpl-gap-3">
+          <span class="avatar" id="userAvatar">—</span>
+        </div>
+      </header>
+
+      <div class="tpl-scroll-area">
+        <div class="tpl-container">
+
+          <div class="dashboard-toolbar">
+            <div>
+              <h1 class="tpl-display" style="font-size: var(--fs-2xl);">Mis cuentas de fondeo</h1>
+              <div class="text-secondary" style="font-size: var(--fs-sm);">Controla el proceso, no adivines el mercado.</div>
+            </div>
+            <button class="btn btn-primary" id="openCreateAccountBtn">+ Nueva cuenta</button>
+          </div>
+
+          <div class="kpi-strip" id="globalKpiStrip">
+            <!-- KPIs globales inyectados por dashboard.js -->
+          </div>
+
+          <div class="dashboard-toolbar">
+            <div class="filter-bar">
+              <input class="input" id="searchInput" placeholder="Buscar por nombre o empresa..." style="min-width: 220px;" />
+              <select class="select" id="filterStatus">
+                <option value="">Todos los estados</option>
+                <option value="active">Activa</option>
+                <option value="in_progress">En progreso</option>
+                <option value="passed">Pasada</option>
+                <option value="failed">Fallida</option>
+                <option value="archived">Archivada</option>
+                <option value="draft">Borrador</option>
+              </select>
+              <select class="select" id="filterType">
+                <option value="">Todos los tipos</option>
+                <option value="instant">Instantánea</option>
+                <option value="1phase">1 fase</option>
+                <option value="2phase">2 fases</option>
+                <option value="3phase">3 fases</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="accountsContainer" class="account-grid">
+            <!-- Tarjetas de cuenta inyectadas por dashboard.js -->
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: WIZARD CREAR CUENTA ============ -->
+  <div class="modal-backdrop hidden" id="createAccountModal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3 class="tpl-panel-title">Nueva cuenta de fondeo</h3>
+        <button class="btn-icon" id="closeCreateModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="wizard-steps">
+          <div class="wizard-step-dot is-active" data-step="1"></div>
+          <div class="wizard-step-dot" data-step="2"></div>
+          <div class="wizard-step-dot" data-step="3"></div>
+        </div>
+
+        <form id="createAccountForm">
+          <!-- PASO 1: datos generales -->
+          <div class="wizard-step" data-step="1">
+            <div class="wizard-fields-grid">
+              <div class="field-group">
+                <label class="field-label">Nombre de la cuenta</label>
+                <input class="input" name="name" placeholder="Ej. FundingPips 100k #1" required />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Empresa de fondeo</label>
+                <input class="input" name="company" placeholder="FundingPips, SpaceProp..." required />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Tipo de cuenta</label>
+                <select class="select" name="type" required>
+                  <option value="instant">Instantánea</option>
+                  <option value="1phase" selected>1 fase</option>
+                  <option value="2phase">2 fases</option>
+                  <option value="3phase">3 fases</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Capital inicial (USD)</label>
+                <input class="input" type="number" name="capital" placeholder="100000" required min="1" />
+              </div>
+            </div>
+          </div>
+
+          <!-- PASO 2: reglas de riesgo -->
+          <div class="wizard-step hidden" data-step="2">
+            <div class="wizard-fields-grid">
+              <div class="field-group">
+                <label class="field-label">Profit target por fase (%)</label>
+                <input class="input" type="number" name="targetPct" placeholder="8" step="0.1" required />
+                <div class="field-hint">Si la cuenta tiene varias fases, se aplica el mismo target a cada una (puedes editarlo luego por fase).</div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Daily loss (%)</label>
+                <input class="input" type="number" name="dailyLossPct" placeholder="5" step="0.1" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Max loss general (%)</label>
+                <input class="input" type="number" name="maxLossPct" placeholder="10" step="0.1" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Tipo de drawdown</label>
+                <select class="select" name="drawdownType">
+                  <option value="static">Static</option>
+                  <option value="trailing">Trailing</option>
+                  <option value="daily_balance">Daily balance based</option>
+                  <option value="daily_equity">Daily equity based</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Mínimo de días (si aplica)</label>
+                <input class="input" type="number" name="minDays" placeholder="0" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Regla de consistencia (opcional)</label>
+                <input class="input" name="consistencyRule" placeholder="Ej. ningún día > 30% del profit total" />
+              </div>
+            </div>
+          </div>
+
+          <!-- PASO 3: gestión de riesgo -->
+          <div class="wizard-step hidden" data-step="3">
+            <div class="wizard-fields-grid">
+              <div class="field-group">
+                <label class="field-label">Riesgo base por operación (%)</label>
+                <input class="input" type="number" name="riskBasePct" placeholder="1" step="0.1" required />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Ratio R:R fijo</label>
+                <select class="select" name="rr" required>
+                  <option value="1.5">1:1.5</option>
+                  <option value="2" selected>1:2</option>
+                  <option value="3">1:3</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Modo de gestión</label>
+                <select class="select" name="riskMode">
+                  <option value="static">Estático</option>
+                  <option value="conservative">Conservador</option>
+                  <option value="dynamic" selected>Dinámico</option>
+                  <option value="recovery">Recuperación</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Promedio de operaciones por día</label>
+                <input class="input" type="number" name="avgOpsPerDay" placeholder="2" value="2" />
+              </div>
+              <div class="field-group full">
+                <label class="field-label tpl-row-between">
+                  <span>Modo automático</span>
+                </label>
+                <div class="tpl-row tpl-gap-3">
+                  <button type="button" class="switch is-on" id="autoModeSwitch" data-value="true"></button>
+                  <span class="text-secondary" style="font-size: var(--fs-xs);">Recalcula el riesgo sugerido automáticamente según el progreso y el drawdown.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="wizardBackBtn">Atrás</button>
+        <button class="btn btn-primary" id="wizardNextBtn">Siguiente</button>
+        <button class="btn btn-primary hidden" id="wizardSubmitBtn">Crear cuenta</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
