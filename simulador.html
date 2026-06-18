@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador · App Fondeo Trading Pro Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+
+  <div class="tpl-app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-mark">R</div>
+        <div class="sidebar-brand-text">TRADING PRO <span>LAB</span></div>
+      </div>
+
+      <nav class="nav-group">
+        <a class="nav-link" href="dashboard.html"><span class="nav-icon">▦</span> Mis cuentas</a>
+        <a class="nav-link is-active" href="simulador.html"><span class="nav-icon">∿</span> Simulador</a>
+        <a class="nav-link hidden" id="adminNavLink" href="admin.html"><span class="nav-icon">⚙</span> Panel admin</a>
+      </nav>
+
+      <div class="sidebar-footer nav-group">
+        <button class="nav-link" id="themeToggleBtn"><span class="nav-icon">◐</span> Cambiar tema</button>
+        <button class="nav-link" id="logoutBtn"><span class="nav-icon">⏻</span> Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <div class="tpl-main">
+      <header class="topbar">
+        <button class="btn-icon mobile-nav-toggle">☰</button>
+        <div class="tpl-eyebrow">Simulador previo a la compra</div>
+        <div class="tpl-row tpl-gap-3">
+          <span class="avatar" id="userAvatar">—</span>
+        </div>
+      </header>
+
+      <div class="tpl-scroll-area">
+        <div class="tpl-container">
+
+          <h1 class="tpl-display" style="font-size: var(--fs-2xl); margin-bottom: 4px;">¿Conviene comprar esta cuenta?</h1>
+          <div class="text-secondary" style="font-size: var(--fs-sm); margin-bottom: var(--sp-6);">
+            Simula miles de escenarios antes de arriesgar tu dinero en una cuenta de fondeo. Esto es una proyección estadística, no una garantía.
+          </div>
+
+          <div class="simulator-layout">
+            <div class="tpl-card">
+              <div class="tpl-panel-title">Datos de la cuenta a evaluar</div>
+              <form id="simForm" style="margin-top: var(--sp-4); display:flex; flex-direction:column; gap: var(--sp-4);">
+                <div class="field-group">
+                  <label class="field-label">Capital de la cuenta (USD)</label>
+                  <input class="input" type="number" name="capital" value="100000" min="1" required />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Tipo de cuenta</label>
+                  <select class="select" name="type">
+                    <option value="instant">Instantánea</option>
+                    <option value="1phase" selected>1 fase</option>
+                    <option value="2phase">2 fases</option>
+                    <option value="3phase">3 fases</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Profit target de la fase (%)</label>
+                  <input class="input" type="number" step="0.1" name="targetPct" value="8" required />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Daily loss (%)</label>
+                  <input class="input" type="number" step="0.1" name="dailyLossPct" value="5" required />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Max loss (%)</label>
+                  <input class="input" type="number" step="0.1" name="maxLossPct" value="10" required />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Tipo de drawdown</label>
+                  <select class="select" name="drawdownType">
+                    <option value="static">Static</option>
+                    <option value="trailing">Trailing</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Win rate estimado de tu sistema (%)</label>
+                  <input class="input" type="number" step="1" name="winRate" value="45" min="1" max="99" required />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Ratio R:R fijo</label>
+                  <select class="select" name="rr" required>
+                    <option value="1.5">1:1.5</option>
+                    <option value="2" selected>1:2</option>
+                    <option value="3">1:3</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Riesgo base por operación (%)</label>
+                  <input class="input" type="number" step="0.1" name="riskBasePct" value="1" required />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Modo de gestión</label>
+                  <select class="select" name="riskMode">
+                    <option value="static">Estático</option>
+                    <option value="conservative">Conservador</option>
+                    <option value="dynamic" selected>Dinámico</option>
+                    <option value="recovery">Recuperación</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Operaciones promedio por día</label>
+                  <input class="input" type="number" step="1" name="opsPerDay" value="2" min="1" required />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Simular</button>
+              </form>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap: var(--sp-5);">
+              <div id="simEmptyState" class="tpl-card">
+                <div class="state-block">
+                  <div class="state-icon">∿</div>
+                  <div class="state-title">Completa los datos y presiona "Simular"</div>
+                  <div class="text-tertiary" style="font-size: var(--fs-xs);">Corremos 1,500 escenarios aleatorios respetando tus reglas de daily loss, max loss y target.</div>
+                </div>
+              </div>
+
+              <div id="simResults" class="hidden" style="display:flex; flex-direction:column; gap: var(--sp-5);">
+                <div class="tpl-card">
+                  <div class="tpl-panel-title">Probabilidad de resultado (1,500 simulaciones)</div>
+                  <div class="sim-probability-bar" id="simProbBar" style="margin-top: var(--sp-4);"></div>
+                  <div class="sim-legend">
+                    <span class="sim-legend-item"><span class="sim-legend-dot" style="background: var(--color-success);"></span> Pasa</span>
+                    <span class="sim-legend-item"><span class="sim-legend-dot" style="background: var(--color-danger);"></span> Falla</span>
+                    <span class="sim-legend-item"><span class="sim-legend-dot" style="background: var(--text-tertiary);"></span> Inconcluso</span>
+                  </div>
+                </div>
+
+                <div class="sim-result-grid" id="simKpiGrid"></div>
+
+                <div class="tpl-card">
+                  <div class="tpl-panel-title">Lectura rápida</div>
+                  <div id="simReadout" class="text-secondary" style="margin-top: var(--sp-3); font-size: var(--fs-sm); line-height: 1.6;"></div>
+                </div>
+
+                <div id="simWarnings"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/simulador.js"></script>
+</body>
+</html>

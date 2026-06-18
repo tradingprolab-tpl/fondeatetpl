@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · App Fondeo Trading Pro Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+
+  <div class="tpl-app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-mark">R</div>
+        <div class="sidebar-brand-text">TRADING PRO <span>LAB</span></div>
+      </div>
+
+      <nav class="nav-group">
+        <a class="nav-link" href="dashboard.html"><span class="nav-icon">▦</span> Mis cuentas</a>
+        <a class="nav-link" href="simulador.html"><span class="nav-icon">∿</span> Simulador</a>
+        <a class="nav-link is-active" href="admin.html"><span class="nav-icon">⚙</span> Panel admin</a>
+      </nav>
+
+      <div class="sidebar-footer nav-group">
+        <button class="nav-link" id="themeToggleBtn"><span class="nav-icon">◐</span> Cambiar tema</button>
+        <button class="nav-link" id="logoutBtn"><span class="nav-icon">⏻</span> Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <div class="tpl-main">
+      <header class="topbar">
+        <button class="btn-icon mobile-nav-toggle">☰</button>
+        <div class="tpl-eyebrow">Panel de administración</div>
+        <div class="tpl-row tpl-gap-3">
+          <span class="avatar" id="userAvatar">—</span>
+        </div>
+      </header>
+
+      <div class="tpl-scroll-area">
+        <div class="tpl-container">
+
+          <h1 class="tpl-display" style="font-size: var(--fs-2xl); margin-bottom: 4px;">Whitelist de Reyes y Príncipes</h1>
+          <div class="text-secondary" style="font-size: var(--fs-sm); margin-bottom: var(--sp-6);">
+            Aprueba o revoca el acceso de los usuarios registrados a la app.
+          </div>
+
+          <div class="admin-stat-row">
+            <div class="kpi"><div class="kpi-accent-bar"></div><div class="kpi-label">Usuarios totales</div><div class="kpi-value" id="statTotal">0</div></div>
+            <div class="kpi is-warning"><div class="kpi-accent-bar"></div><div class="kpi-label">Pendientes de aprobar</div><div class="kpi-value" id="statPending">0</div></div>
+            <div class="kpi is-success"><div class="kpi-accent-bar"></div><div class="kpi-label">Aprobados</div><div class="kpi-value" id="statApproved">0</div></div>
+          </div>
+
+          <div class="tpl-card">
+            <div class="tpl-panel-title">Usuarios registrados</div>
+            <input class="input" id="searchUserInput" placeholder="Buscar por correo..." style="margin: var(--sp-4) 0; max-width: 320px;" />
+            <div id="usersListContainer"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
